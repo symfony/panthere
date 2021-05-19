@@ -338,4 +338,15 @@ class CrawlerTest extends TestCase
 
         self::createPantherClient()->request('GET', self::$baseUri.'/normalize.html')->filter('#normalize')->text(null, false);
     }
+
+    public function testCrawlerStillWorksAfterClientDestruction(): void
+    {
+        $client = Client::createChromeClient();
+        self::startWebServer();
+
+        $crawler = $client->request('GET', self::$baseUri.'/basic.html');
+        unset($client);
+
+        $this->assertStringContainsString('<title>A basic page</title>', $crawler->html());
+    }
 }
