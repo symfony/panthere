@@ -391,6 +391,27 @@ $client = self::createPantherClient([
 * `PANTHER_FIREFOX_ARGUMENTS`: to customize Firefox arguments. You need to set `PANTHER_NO_HEADLESS` to fully customize.
 * `PANTHER_FIREFOX_BINARY`: to use another `firefox` binary
 
+### Changing the Size of the Browser Window
+
+It's possible to control the size of the browser window.
+This also controls the size of the screenshots.
+
+
+Chrome:
+
+```php
+$client = Client::createChromeClient(null, ['--window-size=1500,4000']);
+or using the `PANTHER_CHROME_ARGUMENTS` environment variable:
+PANTHER_CHROME_ARGUMENTS='--window-size=1500,4000'
+Firefox:
+
+```php
+use Facebook\WebDriver\WebDriverDimension;
+$client = Client::createFirefoxClient();
+$size = new WebDriverDimension(1500, 4000);
+$client->manage()->window()->setSize($size);
+```
+
 ### Accessing To Hidden Text
 
 According to the spec, WebDriver implementations return only the **displayed** text by default.
