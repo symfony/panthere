@@ -391,6 +391,15 @@ $client = self::createPantherClient([
 * `PANTHER_FIREFOX_ARGUMENTS`: to customize Firefox arguments. You need to set `PANTHER_NO_HEADLESS` to fully customize.
 * `PANTHER_FIREFOX_BINARY`: to use another `firefox` binary
 
+### Changing the Port
+
+By default, chromedriver is listening on port 9515, and geckodriver on 4444. To change this value, pass another port to the `$options` array:
+
+```php
+$client = Client::createChromeClient(null, null, ['port' => 1234]);
+$client = Client::createFirefoxClient(null, null, ['port' => 1234]);
+```
+
 ### Accessing To Hidden Text
 
 According to the spec, WebDriver implementations return only the **displayed** text by default.
