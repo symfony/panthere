@@ -25,6 +25,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Panther\Client;
 use Symfony\Component\Panther\Cookie\CookieJar;
 use Symfony\Component\Panther\DomCrawler\Crawler;
+use Symfony\Component\Panther\PantherTestCase;
 use Symfony\Component\Panther\ProcessManager\ChromeManager;
 
 /**
@@ -32,6 +33,33 @@ use Symfony\Component\Panther\ProcessManager\ChromeManager;
  */
 class ClientTest extends TestCase
 {
+    public function testCreatePantherClientInvalidArgument(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        self::createPantherClient([
+            'browser_arguments' => 'bad browser arguments data type',
+        ]);
+    }
+
+    public function testCreatePantherClientWithBrowserArgument(): void
+    {
+        $client = self::createPantherClient([
+            'browser' => PantherTestCase::CHROME,
+            'browser_arguments' => ['--window-size=1400,900'],
+        ]);
+        $this->assertInstanceOf(AbstractBrowser::class, $client);
+        $this->assertInstanceOf(WebDriver::class, $client);
+        $this->assertInstanceOf(JavaScriptExecutor::class, $client);
+        $this->assertInstanceOf(KernelInterface::class, self::$kernel);
+
+        // I'm not sure exactly how to start with a clear class, since the
+        // test file assumes the client will be present for the next tests
+        // So I'm cleaning up this way here so that we can have a default
+        // client next
+        self::$pantherClient = null;
+    }
+
     public function testCreateClient(): void
     {
         $client = self::createPantherClient();

@@ -161,11 +161,14 @@ trait PantherTestCaseTrait
      * Creates the primary browser.
      *
      * @param array $options see {@see $defaultOptions}
+     *
+     * @throws \InvalidArgumentException
      */
     protected static function createPantherClient(array $options = [], array $kernelOptions = [], array $managerOptions = []): PantherClient
     {
         $browser = ($options['browser'] ?? self::$defaultOptions['browser'] ?? PantherTestCase::CHROME);
         $callGetClient = \is_callable([self::class, 'getClient']) && (new \ReflectionMethod(self::class, 'getClient'))->isStatic();
+
         if (null !== self::$pantherClient) {
             $browserManager = self::$pantherClient->getBrowserManager();
             if (
@@ -180,10 +183,20 @@ trait PantherTestCaseTrait
 
         self::startWebServer($options);
 
+        $browserArguments = null;
+
+        if (\array_key_exists('browser_arguments', $options)) {
+            if (!\is_array($options['browser_arguments'])) {
+                throw new \InvalidArgumentException('Expected key "browser_arguments" to be an array.');
+            }
+
+            $browserArguments = $options['browser_arguments'];
+        }
+
         if (PantherTestCase::CHROME === $browser) {
-            self::$pantherClients[0] = self::$pantherClient = Client::createChromeClient(null, null, $managerOptions, self::$baseUri);
+            self::$pantherClients[0] = self::$pantherClient = Client::createChromeClient(null, $browserArguments, $managerOptions, self::$baseUri);
         } else {
-            self::$pantherClients[0] = self::$pantherClient = Client::createFirefoxClient(null, null, $managerOptions, self::$baseUri);
+            self::$pantherClients[0] = self::$pantherClient = Client::createFirefoxClient(null, $browserArguments, $managerOptions, self::$baseUri);
         }
 
         if (is_a(self::class, KernelTestCase::class, true)) {
